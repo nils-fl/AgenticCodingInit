@@ -26,6 +26,7 @@ bash agentic_init.sh --codex
 # Target a specific directory
 bash agentic_init.sh /path/to/your/repo
 bash agentic_init.sh --claude /path/to/your/repo
+bash agentic_init.sh --codex /path/to/your/repo
 ```
 
 ## Workflow Overview
