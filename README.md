@@ -29,6 +29,16 @@ bash agentic_init.sh --claude /path/to/your/repo
 bash agentic_init.sh --codex /path/to/your/repo
 ```
 
+### Optional: Zsh Integration
+
+Add this function to your `.zshrc` to run the initializer from anywhere:
+
+```zsh
+code_init_repo() {
+  bash /path/to/agentic_init.sh "${1:-.}"
+}
+```
+
 ## Workflow Overview
 
 1. **Planner**: Analyzes requirements and breaks them down into task files in `.ai/tasks/`.
