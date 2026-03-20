@@ -2,15 +2,20 @@
 set -euo pipefail
 
 # Usage:
-#   bash agentic_init.sh [--claude] [--codex] [TARGET_DIR]
+#   bash agentic_init.sh [--claude] [--codex] [--with-skill] [TARGET_DIR]
 #
 # Safe behavior:
 # - creates .ai structure if missing
 # - appends workflow sections to CLAUDE.md and AGENTS.md only if not present
 # - does not overwrite existing files unless you edit them manually
+#
+# --with-skill: (Claude mode only) copies skills/discover-commands/SKILL.md
+#               into .claude/skills/discover-commands/ in the target repo
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 INIT_CLAUDE=false
 INIT_CODEX=false
+WITH_SKILL=false
 TARGET_DIR=""
 
 # Parse arguments
@@ -22,6 +27,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --codex)
       INIT_CODEX=true
+      shift
+      ;;
+    --with-skill)
+      WITH_SKILL=true
       shift
       ;;
     -*)
@@ -283,6 +292,23 @@ if [[ "$INIT_CLAUDE" == true ]]; then
     } > "$tmp_file"
     mv "$tmp_file" "CLAUDE.md"
     echo "[OK] Replaced bare CLAUDE.md with starter template"
+  fi
+fi
+
+# --- Install project-scoped skill (Claude only) ---
+if [[ "$WITH_SKILL" == true ]]; then
+  if [[ "$INIT_CLAUDE" == true ]]; then
+    SKILL_SRC="$SCRIPT_DIR/skills/discover-commands/SKILL.md"
+    SKILL_DEST=".claude/skills/discover-commands/SKILL.md"
+    if [ -f "$SKILL_SRC" ]; then
+      mkdir -p ".claude/skills/discover-commands"
+      cp "$SKILL_SRC" "$SKILL_DEST"
+      echo "[OK] Installed discover-commands skill to $SKILL_DEST"
+    else
+      echo "[WARN] Skill source not found: $SKILL_SRC — skipping skill install"
+    fi
+  else
+    echo "[WARN] --with-skill requires --claude (Codex has no skill system) — skipping"
   fi
 fi
 

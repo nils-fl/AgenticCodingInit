@@ -1,12 +1,42 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Installs Claude Code skills from this repo to ~/.claude/skills/
-# Run once per machine after cloning this repo.
+# Installs Claude Code skills from this repo.
+# Usage:
+#   bash install-skills.sh                      # user-level (~/.claude/skills/)
+#   bash install-skills.sh --project            # project-level (./.claude/skills/)
+#   bash install-skills.sh --project /path/dir  # project-level in specific repo
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SKILLS_SRC="$SCRIPT_DIR/skills"
-SKILLS_DEST="$HOME/.claude/skills"
+
+# Parse arguments
+PROJECT_MODE=false
+PROJECT_DIR="."
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --project)
+      PROJECT_MODE=true
+      shift
+      if [[ $# -gt 0 && "$1" != -* ]]; then
+        PROJECT_DIR="$1"
+        shift
+      fi
+      ;;
+    *)
+      echo "[ERROR] Unknown option: $1"
+      echo "Usage: bash install-skills.sh [--project [DIR]]"
+      exit 1
+      ;;
+  esac
+done
+
+if [[ "$PROJECT_MODE" == true ]]; then
+  SKILLS_DEST="$(cd "$PROJECT_DIR" && pwd)/.claude/skills"
+else
+  SKILLS_DEST="$HOME/.claude/skills"
+fi
 
 if [ ! -d "$SKILLS_SRC" ]; then
   echo "[ERROR] Skills directory not found: $SKILLS_SRC"
@@ -24,4 +54,5 @@ for skill_dir in "$SKILLS_SRC"/*/; do
 done
 
 echo
-echo "[DONE] Skills installed. Restart Claude Code to pick up new skills."
+echo "[DONE] Skills installed to: $SKILLS_DEST"
+echo "       Restart Claude Code to pick up new skills."

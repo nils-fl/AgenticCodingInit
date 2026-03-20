@@ -62,11 +62,23 @@ code_init_repo() {
 
 Automatically detects your project's ecosystem and fills in the `## Development Commands` section of `CLAUDE.md` (or a file you specify).
 
-**One-time install** (run once per machine after cloning this repo):
+**Install options:**
 
 ```bash
+# User-level (global — available in all projects):
 bash install-skills.sh
+
+# Project-level (scoped to current repo):
+bash install-skills.sh --project
+
+# Project-level in a specific repo:
+bash install-skills.sh --project /path/to/repo
+
+# Via agentic_init.sh (project-level, during repo init):
+bash agentic_init.sh --claude --with-skill /path/to/repo
 ```
+
+Use **user-level** when you want the skill always available across all projects. Use **project-level** when you want the skill to ship with the repo so the whole team gets it.
 
 **Usage** (inside Claude Code):
 
