@@ -1,37 +1,89 @@
 # Agentic Coding Initializer
 
-This repository provides a custom agentic workflow initializer for **Claude Code** and **Codex**. It sets up a structured environment for AI-driven development by creating a dedicated `.ai/` directory and initializing `CLAUDE.md` and `AGENTS.md` with best-practice workflows.
+Give your AI coding assistant a structured workflow.
 
-## Features
+## The Problem
 
-- **Standardized Structure**: Creates `.ai/tasks`, `.ai/tasks-done`, and helper files (`plan.md`, `context.md`, `repo-map.md`).
-- **Workflow Enforcement**: Injects persona-based instructions for Planners, Coders, Testers, and Reviewers.
-- **Timestamped Tasks**: Encourages `YYYYMMDD-HHMM-` prefixes for task files to prevent merge conflicts and maintain order.
-- **Git Integration**: Automatically updates `.gitignore` to keep ephemeral AI state out of the repository if desired.
+AI coding assistants without guardrails tend to:
+- Try to implement everything at once instead of one task at a time
+- Skip testing and review steps
+- Lose context across sessions
+- Diverge from architectural decisions made earlier in the project
+
+## The Solution
+
+A lightweight convention: **plan first, implement one task, test, review, stop.**
+
+This repo initializes that convention in any project — a `.ai/` folder for task tracking, a `CLAUDE.md` / `AGENTS.md` with persona-based instructions, and an `ARCHITECTURE.md` template to keep design decisions explicit.
+
+## How It Works
+
+The workflow is built around four personas and seven steps:
+
+```
+┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐
+│ Planner  │ -> │  Coder   │ -> │  Tester  │ -> │ Reviewer │
+└──────────┘    └──────────┘    └──────────┘    └──────────┘
+```
+
+| # | Step | Who | Output |
+|---|------|-----|--------|
+| 1 | Write implementation plan | Planner | `.ai/plan.md` |
+| 2 | Create timestamped task files | Planner | `.ai/tasks/YYYYMMDD-HHMM-*.md` |
+| 3 | Implement **one** task | Coder | code changes |
+| 4 | Run tests, lint, type checks | Tester | pass/fail report |
+| 5 | Review the diff | Reviewer | feedback |
+| 6 | Move task to done | — | `.ai/tasks-done/` |
+| 7 | **Stop** | — | — |
+
+The AI never executes the entire feature in a single loop. Each task is a checkpoint.
 
 ## Quick Start
 
-Run the script in the root of your project:
+### Option A: Claude Code (recommended)
+
+Install the `/init-workflow` skill once, then run it in any project:
+
+```bash
+# User-level install (available in all your projects):
+bash install-skills.sh
+
+# Or project-level (ships with the repo, for the whole team):
+bash install-skills.sh --project
+bash install-skills.sh --project /path/to/repo
+```
+
+Then inside Claude Code:
+
+```
+/init-workflow
+/init-workflow /path/to/repo
+```
+
+The skill sets up everything and discovers your dev commands automatically.
+
+### Option B: Shell script
 
 ```bash
 # Initialize both Claude and Codex
 bash agentic_init.sh
 
-# Initialize only Claude
+# Claude only
 bash agentic_init.sh --claude
 
-# Initialize only Codex
+# Codex only
 bash agentic_init.sh --codex
 
 # Target a specific directory
-bash agentic_init.sh /path/to/your/repo
-bash agentic_init.sh --claude /path/to/your/repo
-bash agentic_init.sh --codex /path/to/your/repo
+bash agentic_init.sh --claude /path/to/repo
+
+# Include the /init-workflow skill in the target repo (Claude only)
+bash agentic_init.sh --claude --with-skill /path/to/repo
 ```
 
-### Optional: Zsh Integration
+Both paths are idempotent — re-running skips anything that already exists.
 
-Add this function to your `.zshrc` to run the initializer from anywhere:
+#### Optional: Zsh integration
 
 ```zsh
 code_init_repo() {
@@ -39,73 +91,59 @@ code_init_repo() {
 }
 ```
 
-## Workflow Overview
-
-1. **Planner**: Analyzes requirements and breaks them down into task files in `.ai/tasks/`.
-2. **Coder**: Implements ONE task at a time.
-3. **Tester**: Verifies the implementation.
-4. **Reviewer**: Performs a final check.
-5. **Completion**: Tasks are moved to `.ai/tasks-done/`.
-
-## File Structure
-
-- `.ai/plan.md`: The overall roadmap for the current feature.
-- `.ai/tasks/`: Active task files.
-- `.ai/tasks-done/`: History of completed tasks.
-- `.ai/repo-map.md`: High-level guide for the AI to understand the codebase structure without full scans.
-- `ARCHITECTURE.md`: Detailed architectural documentation — high-level overview and in-depth technical details of the system design.
-- `CLAUDE.md` / `AGENTS.md`: Entry points for Claude Code and Codex instructions.
-
-## Skills (Claude Code Only)
-
-### `/discover-commands`
-
-Automatically detects your project's ecosystem and fills in the `## Development Commands` section of `CLAUDE.md` (or a file you specify).
-
-**Install options:**
-
-```bash
-# User-level (global — available in all projects):
-bash install-skills.sh
-
-# Project-level (scoped to current repo):
-bash install-skills.sh --project
-
-# Project-level in a specific repo:
-bash install-skills.sh --project /path/to/repo
-
-# Via agentic_init.sh (project-level, during repo init):
-bash agentic_init.sh --claude --with-skill /path/to/repo
-```
-
-Use **user-level** when you want the skill always available across all projects. Use **project-level** when you want the skill to ship with the repo so the whole team gets it.
-
-**Usage** (inside Claude Code):
+## What Gets Created
 
 ```
-/discover-commands
-/discover-commands AGENTS.md
+your-repo/
+├── .ai/
+│   ├── plan.md          # Current feature roadmap (gitignored)
+│   ├── context.md       # Session notes and conventions (gitignored)
+│   ├── repo-map.md      # Codebase structure for fast AI orientation
+│   ├── tasks/           # Active task files (gitignored)
+│   └── tasks-done/      # Completed task archive (gitignored)
+├── ARCHITECTURE.md      # System design reference
+├── CLAUDE.md            # Claude Code entry point (personas + workflow)
+└── AGENTS.md            # Codex entry point (personas + workflow)
 ```
 
-The skill reads config files (`package.json`, `pyproject.toml`, `Cargo.toml`, `go.mod`, `Makefile`, `justfile`, `Gemfile`, `mix.exs`) and extracts test, lint, typecheck, format, and build commands. It presents its findings before writing, and preserves any commands you have already filled in.
-
----
+`CLAUDE.md` and `AGENTS.md` get the 4-persona workflow injected. If they already exist, only the workflow section is appended.
 
 ## Recommended Prompts
 
-### For Planning
-Use this prompt when you want the AI to analyze the task and prepare the implementation details:
+### Planning
 
 ```text
-Based on my request create or update .ai/plan.md and create task files in .ai/tasks/. Do not implement anything yet. Stop after the plan and tasks are created.
+Based on my request create or update .ai/plan.md and create task files in .ai/tasks/.
+Do not implement anything yet. Stop after the plan and tasks are created.
 Use a timestamp prefix "YYYYMMDD-HHMM-" to ensure unique filenames.
 ```
 
-### For Implementation
-Use this prompt when you are ready to start coding:
+### Implementation
 
 ```text
-Implement the next tasks from .ai/tasks/.
+Implement the next task from .ai/tasks/.
 Only modify files required for the current task.
 Complete one task, run the verification steps, then stop.
 ```
+
+## Configuration
+
+### `.gitignore` behavior
+
+The script and skill add these patterns to `.gitignore` automatically:
+
+```
+.ai/plan.md
+.ai/tasks/
+.ai/tasks-done/
+.ai/context.md
+```
+
+`repo-map.md` is intentionally **not** gitignored — it's a committed reference for the whole team.
+
+### `--claude` vs `--codex`
+
+- `--claude` creates `CLAUDE.md` with the Claude Code workflow.
+- `--codex` creates `AGENTS.md` with the Codex workflow.
+- Omitting both flags initializes **both** by default.
+- `--with-skill` requires `--claude` (Codex has no skill system).

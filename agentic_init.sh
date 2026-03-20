@@ -9,8 +9,8 @@ set -euo pipefail
 # - appends workflow sections to CLAUDE.md and AGENTS.md only if not present
 # - does not overwrite existing files unless you edit them manually
 #
-# --with-skill: (Claude mode only) copies skills/discover-commands/SKILL.md
-#               into .claude/skills/discover-commands/ in the target repo
+# --with-skill: (Claude mode only) copies skills/init-workflow/SKILL.md
+#               into .claude/skills/init-workflow/ in the target repo
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 INIT_CLAUDE=false
@@ -298,12 +298,12 @@ fi
 # --- Install project-scoped skill (Claude only) ---
 if [[ "$WITH_SKILL" == true ]]; then
   if [[ "$INIT_CLAUDE" == true ]]; then
-    SKILL_SRC="$SCRIPT_DIR/skills/discover-commands/SKILL.md"
-    SKILL_DEST=".claude/skills/discover-commands/SKILL.md"
+    SKILL_SRC="$SCRIPT_DIR/skills/init-workflow/SKILL.md"
+    SKILL_DEST=".claude/skills/init-workflow/SKILL.md"
     if [ -f "$SKILL_SRC" ]; then
-      mkdir -p ".claude/skills/discover-commands"
+      mkdir -p ".claude/skills/init-workflow"
       cp "$SKILL_SRC" "$SKILL_DEST"
-      echo "[OK] Installed discover-commands skill to $SKILL_DEST"
+      echo "[OK] Installed init-workflow skill to $SKILL_DEST"
     else
       echo "[WARN] Skill source not found: $SKILL_SRC — skipping skill install"
     fi
