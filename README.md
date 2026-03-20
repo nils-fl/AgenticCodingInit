@@ -62,6 +62,20 @@ Then inside Claude Code:
 
 The skill sets up everything and discovers your dev commands automatically.
 
+#### Skill description
+
+The first paragraph of `SKILL.md` is used as the description shown in Claude Code's `/skills` dialog. Edit it to customize how the skill appears.
+
+#### Updating the skill
+
+After pulling the latest version of this repo, re-run the same install command to copy the updated `SKILL.md` over the existing one:
+
+```bash
+# Re-run to update:
+bash install-skills.sh          # user-level
+bash install-skills.sh --project  # project-level
+```
+
 ### Option B: Shell script
 
 ```bash
