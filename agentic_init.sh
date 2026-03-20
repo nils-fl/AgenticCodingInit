@@ -115,9 +115,34 @@ REPO_MAP_MD_CONTENT='# Repository Map
 ## Tests
 
 ## Commands
+<!-- Discover from project config files (package.json, Makefile, pyproject.toml, Cargo.toml, etc.) -->
 - test:
 - lint:
 - typecheck:
+'
+
+ARCHITECTURE_MD_CONTENT='# Architecture
+
+## Overview
+<!-- High-level description of the application/repository.
+     What does it do? What problem does it solve?
+     What are the major components and how do they relate to each other? -->
+
+## Details
+<!-- Very technical, very detailed architectural documentation.
+
+     Suggested topics to cover:
+     - System components and module boundaries
+     - Data flow and control flow
+     - Key abstractions and design patterns
+     - Storage and persistence layer
+     - API surface and protocols
+     - External dependencies and integrations
+     - Deployment topology and infrastructure
+     - Security model and authentication/authorization
+     - Error handling and resilience patterns
+     - Performance characteristics and scaling considerations
+     - Important design decisions, trade-offs, and their rationale -->
 '
 
 # --- Claude Specific Content ---
@@ -162,6 +187,9 @@ Never execute the entire feature in a single loop.
 - Use `.ai/repo-map.md` as the primary reference for project structure.
 - Avoid scanning the entire repository unless needed.
 - If new files or modules are added, update `.ai/repo-map.md`.
+- Use `ARCHITECTURE.md` as the reference for architectural decisions and system design.
+- When the architecture changes, update `ARCHITECTURE.md` accordingly.
+- On first interaction with a new repo, discover development commands (test, lint, typecheck) from project config files and fill in the Development Commands section if empty.
 '
 
 # --- Codex Specific Content ---
@@ -206,6 +234,9 @@ Never execute the entire feature in a single loop.
 - Use `.ai/repo-map.md` as the primary reference for project structure.
 - Avoid scanning the entire repository unless needed.
 - If new files or modules are added, update `.ai/repo-map.md`.
+- Use `ARCHITECTURE.md` as the reference for architectural decisions and system design.
+- When the architecture changes, update `ARCHITECTURE.md` accordingly.
+- On first interaction with a new repo, discover development commands (test, lint, typecheck) from project config files and fill in the Development Commands section if empty.
 '
 
 CLAUDE_NEW_FILE_CONTENT='# Project Instructions
@@ -239,6 +270,7 @@ Run type checks:
 ensure_file ".ai/plan.md" "$PLAN_MD_CONTENT"
 ensure_file ".ai/context.md" "$CONTEXT_MD_CONTENT"
 ensure_file ".ai/repo-map.md" "$REPO_MAP_MD_CONTENT"
+ensure_file "ARCHITECTURE.md" "$ARCHITECTURE_MD_CONTENT"
 
 # --- Setup CLAUDE.md ---
 if [[ "$INIT_CLAUDE" == true ]]; then
@@ -294,4 +326,5 @@ echo "Next steps:"
 [[ "$INIT_CLAUDE" == true ]] && echo "1. Fill in CLAUDE.md project-specific instructions"
 [[ "$INIT_CODEX" == true ]] && echo "2. Fill in AGENTS.md project-specific instructions"
 echo "3. Fill in .ai/repo-map.md"
-echo "4. Start Claude Code or Codex"
+echo "4. Fill in ARCHITECTURE.md with your system's architecture"
+echo "5. Start Claude Code or Codex"

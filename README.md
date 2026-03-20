@@ -53,7 +53,31 @@ code_init_repo() {
 - `.ai/tasks/`: Active task files.
 - `.ai/tasks-done/`: History of completed tasks.
 - `.ai/repo-map.md`: High-level guide for the AI to understand the codebase structure without full scans.
+- `ARCHITECTURE.md`: Detailed architectural documentation — high-level overview and in-depth technical details of the system design.
 - `CLAUDE.md` / `AGENTS.md`: Entry points for Claude Code and Codex instructions.
+
+## Skills (Claude Code Only)
+
+### `/discover-commands`
+
+Automatically detects your project's ecosystem and fills in the `## Development Commands` section of `CLAUDE.md` (or a file you specify).
+
+**One-time install** (run once per machine after cloning this repo):
+
+```bash
+bash install-skills.sh
+```
+
+**Usage** (inside Claude Code):
+
+```
+/discover-commands
+/discover-commands AGENTS.md
+```
+
+The skill reads config files (`package.json`, `pyproject.toml`, `Cargo.toml`, `go.mod`, `Makefile`, `justfile`, `Gemfile`, `mix.exs`) and extracts test, lint, typecheck, format, and build commands. It presents its findings before writing, and preserves any commands you have already filled in.
+
+---
 
 ## Recommended Prompts
 
