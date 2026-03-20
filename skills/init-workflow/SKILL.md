@@ -4,9 +4,17 @@ Initialize the full agentic workflow in this repository (or the directory given 
 
 ## Instructions
 
-### 0. Determine the target directory
-- If `$ARGUMENTS` is set and non-empty, treat it as the target path. All file operations below are relative to that path.
-- Otherwise, default to the current working directory (`.`).
+### 0. Parse arguments and determine the target directory
+Parse `$ARGUMENTS` as follows:
+- If `$ARGUMENTS` contains the flag `--mermaid`, set **mermaid-mode = ON** and remove that token from the argument string before further processing.
+- After removing any flags, if the remaining string is non-empty, treat it as the target path. All file operations below are relative to that path.
+- Otherwise default to the current working directory (`.`).
+
+Examples:
+- `/init-workflow` → target = `.`, mermaid-mode = OFF
+- `/init-workflow ../my-repo` → target = `../my-repo`, mermaid-mode = OFF
+- `/init-workflow --mermaid` → target = `.`, mermaid-mode = ON
+- `/init-workflow ../my-repo --mermaid` → target = `../my-repo`, mermaid-mode = ON
 
 ### 1. Create `.ai/` structure
 Create the following files **only if they do not already exist**. Report `[SKIP] Exists: <path>` for any that do.
@@ -201,6 +209,59 @@ If `ARCHITECTURE.md` does not exist, create it with the template below. Otherwis
      - Important design decisions, trade-offs, and their rationale -->
 ```
 
+### 3b. Create Mermaid diagram files (mermaid-mode only)
+Skip this step entirely if mermaid-mode is OFF.
+
+If mermaid-mode is ON, create the following files **only if they do not already exist**. Report `[SKIP] Exists: <path>` for any that do.
+
+**`ARCHITECTURE_OVERVIEW.mmd`**
+```
+%%{init: {'theme': 'default'}}%%
+graph TD
+    %% High-level component diagram — edit to reflect your system
+    Client["Client / Frontend"]
+    Backend["Backend / API"]
+    DB["Database"]
+
+    Client -->|HTTP/WS| Backend
+    Backend -->|query| DB
+```
+
+**`ARCHITECTURE_DETAILED.mmd`**
+```
+%%{init: {'theme': 'default'}}%%
+graph TD
+    %% Detailed architecture diagram — edit to reflect your system
+    %% Suggested: show modules, data flows, external services, auth, etc.
+
+    subgraph Frontend
+        UI["UI Layer"]
+    end
+
+    subgraph Backend
+        API["API Layer"]
+        Service["Service Layer"]
+        Repo["Repository Layer"]
+    end
+
+    subgraph Persistence
+        DB["Database"]
+        Cache["Cache"]
+    end
+
+    UI -->|REST/GraphQL| API
+    API --> Service
+    Service --> Repo
+    Repo --> DB
+    Service --> Cache
+```
+
+When mermaid-mode is ON, also inject the following line into **both** the full starter template and the append-only workflow section of CLAUDE.md (inside `### Repository Context`, after the `ARCHITECTURE.md` bullet):
+
+```
+- Use `ARCHITECTURE_OVERVIEW.mmd` and `ARCHITECTURE_DETAILED.mmd` as living Mermaid diagrams. When the architecture changes, update both diagrams to reflect the new structure.
+```
+
 ### 4. Discover dev commands and fill in `CLAUDE.md`
 Using the config files detected by the bang command above:
 
@@ -251,5 +312,6 @@ Next steps:
   1. Fill in CLAUDE.md with project-specific conventions
   2. Fill in .ai/repo-map.md with your codebase structure
   3. Fill in ARCHITECTURE.md with your system design
+  [if mermaid-mode] 3b. Edit ARCHITECTURE_OVERVIEW.mmd and ARCHITECTURE_DETAILED.mmd to reflect your system
   4. Start Claude Code and use the Planner → Coder → Tester → Reviewer workflow
 ```
