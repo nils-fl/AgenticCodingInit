@@ -58,9 +58,15 @@ Then inside Claude Code:
 ```
 /init-workflow
 /init-workflow /path/to/repo
+
+# Also create Mermaid architecture diagrams:
+/init-workflow --mermaid
+/init-workflow /path/to/repo --mermaid
 ```
 
 The skill sets up everything and discovers your dev commands automatically.
+
+Pass `--mermaid` to also create `ARCHITECTURE_OVERVIEW.mmd` and `ARCHITECTURE_DETAILED.mmd` with starter templates. Claude will keep them updated alongside `ARCHITECTURE.md` as the codebase evolves.
 
 #### Skill description
 
@@ -115,9 +121,11 @@ your-repo/
 │   ├── repo-map.md      # Codebase structure for fast AI orientation
 │   ├── tasks/           # Active task files (gitignored)
 │   └── tasks-done/      # Completed task archive (gitignored)
-├── ARCHITECTURE.md      # System design reference
-├── CLAUDE.md            # Claude Code entry point (personas + workflow)
-└── AGENTS.md            # Codex entry point (personas + workflow)
+├── ARCHITECTURE.md           # System design reference
+├── ARCHITECTURE_OVERVIEW.mmd # High-level Mermaid diagram (--mermaid only)
+├── ARCHITECTURE_DETAILED.mmd # Detailed Mermaid diagram (--mermaid only)
+├── CLAUDE.md                 # Claude Code entry point (personas + workflow)
+└── AGENTS.md                 # Codex entry point (personas + workflow)
 ```
 
 `CLAUDE.md` and `AGENTS.md` get the 4-persona workflow injected. If they already exist, only the workflow section is appended.
